@@ -45,9 +45,14 @@ A continuación se presentan los diagramas que ilustran la estructura y el funci
 
 - **Modelo de Entidad-Relación**:
   ![Modelo de Entidad-Relación](graficos/modelo_E-T.jpeg) 
+##
 
 - **Diagrama de Clases**:
   ![Diagrama de Clases](graficos/Class_diagram/Class_interfaz.jpeg)
+  ![Diagrama de Clases](graficos/Class_diagram/migrate_data.jpg)
+  ![Diagrama de Clases](graficos/Class_diagram/MySQL_connection.jpg)
+  ![Diagrama de Clases](graficos/Class_diagram/SQLserver_connection.jpg)
+##
 
 - **Diagramas de Flujo**:
   ![Diagrama de Flujo](graficos/Class_diagram/Class_interfaz.jpeg)
