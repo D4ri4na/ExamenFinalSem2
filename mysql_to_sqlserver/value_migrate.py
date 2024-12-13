@@ -154,30 +154,7 @@ def migrate_data():
             print(f"Error during table creation or foreign key addition: {e}")
             return
         
-                        # Add foreign key constraints to MS SQL Server
-            
-        for fk in foreign_keys_list:
-            # Imprimir toda la información de la clave foránea
-            #print(f"Foreign Key Info: {fk}")
-
-            constraint_name = fk['CONSTRAINT_NAME']
-            table_name = fk['TABLE_NAME']
-            column_name = fk['COLUMN_NAME']
-            referenced_table_name = fk['REFERENCED_TABLE_NAME']
-            referenced_column_name = fk['REFERENCED_COLUMN_NAME']
-            
-            alter_table_query = f"""
-            ALTER TABLE {table_name}
-            ADD CONSTRAINT {constraint_name}
-            FOREIGN KEY ({column_name})
-            REFERENCES {referenced_table_name} ({referenced_column_name});
-            """
-
-            try:
-                mssql_conn.execute_update(alter_table_query)
-                print(f"Foreign key constraint added successfully to table '{table_name}'.")
-            except Exception as e:
-                print(f"Error adding foreign key constraint to table '{table_name}': {e}")
+        
 
 
         # Insert data into the tables
@@ -202,6 +179,30 @@ def migrate_data():
                     mssql_conn.execute_update(insert_query)
                 except Exception as e:
                     print(f'Error: {e}')  # Show the error but continue with the next record
+
+         # Add foreign key constraints to MS SQL Server
+        for fk in foreign_keys_list:
+            # Imprimir toda la información de la clave foránea
+            #print(f"Foreign Key Info: {fk}")
+
+            constraint_name = fk['CONSTRAINT_NAME']
+            table_name = fk['TABLE_NAME']
+            column_name = fk['COLUMN_NAME']
+            referenced_table_name = fk['REFERENCED_TABLE_NAME']
+            referenced_column_name = fk['REFERENCED_COLUMN_NAME']
+            
+            alter_table_query = f"""
+            ALTER TABLE {table_name}
+            ADD CONSTRAINT {constraint_name}
+            FOREIGN KEY ({column_name})
+            REFERENCES {referenced_table_name} ({referenced_column_name});
+            """
+
+            try:
+                mssql_conn.execute_update(alter_table_query)
+                print(f"Foreign key constraint added successfully to table '{table_name}'.")
+            except Exception as e:
+                print(f"Error adding foreign key constraint to table '{table_name}': {e}")
 
         # Add "modificación" column to each existing table
         for table in tables:
