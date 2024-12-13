@@ -44,13 +44,13 @@ Se han implementado pruebas para asegurar que todas las funcionalidades de la in
 A continuación se presentan los diagramas que ilustran la estructura y el funcionamiento del sistema:
 
 - **Modelo de Entidad-Relación**:
-  ![Modelo de Entidad-Relación](graficos\modelo_E-T.jpeg)
+  ![Modelo de Entidad-Relación](graficos/modelo_E-T.jpeg) 
 
 - **Diagrama de Clases**:
-  ![Diagrama de Clases](graficos\Class_diagram\Class_interfaz.jpeg)
+  ![Diagrama de Clases](graficos/Class_diagram/Class_interfaz.jpeg)
 
 - **Diagramas de Flujo**:
-  ![Diagrama de Flujo](graficos\Class_diagram\Class_interfaz.jpeg)
+  ![Diagrama de Flujo](graficos/Class_diagram/Class_interfaz.jpeg)
 
 
 ## Colaboradoras
