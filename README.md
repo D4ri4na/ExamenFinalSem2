@@ -722,13 +722,13 @@ FUNCION delete_record(display_frame, record_type):
 
     nueva_ventana.protocol("WM_DELETE_WINDOW", lambda: nueva_ventana.destroy())
 
-   FUNCION get_related_tables(record_type):
-       related_tables = []
-       SI record_type == 'parent_table' ENTONCES:
-        related_tables = ['child_table']
-          RETURN related_tables
+      FUNCION get_related_tables(record_type):
+          related_tables = []
+          SI record_type == 'parent_table' ENTONCES:
+           related_tables = ['child_table']
+             RETURN related_tables
           
-   root.mainloop()
+      root.mainloop()
 
 
 ## Colaboradoras
