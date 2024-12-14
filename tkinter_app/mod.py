@@ -75,7 +75,7 @@ def mod_record(display_frame, record_type):
             tk.Label(nueva_ventana, text=f"Error: {str(e)}", bg=LIGHT_COLOR, fg="red").pack()
 
     tk.Button(nueva_ventana, text="Cargar Registro", command=load_record).pack()
-    tk.Button(nueva_ventana, text="Modificar", command=submit).pack()
+    tk.Button(nueva_ventana, text="Modificar ", command=submit).pack()
     tk.Button(nueva_ventana, text="Cerrar", command=nueva_ventana.destroy).pack()
 
     nueva_ventana.protocol(
