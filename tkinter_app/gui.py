@@ -6,6 +6,9 @@ from const import *
 
 class App:
     def __init__(self, root):
+        """
+        Inicializa la aplicación con la ventana principal y configura los marcos para los botones y la visualización.
+        """
         self.root = root
         self.root.geometry(SIZE_WINDOW)
         self.root.title("Gestor De Datos")
@@ -18,9 +21,11 @@ class App:
         self.display_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         self.crear_botones_principales()
-        
 
     def crear_botones_principales(self):
+        """
+        Crea los botones principales de la aplicación para gestionar los datos.
+        """
         for widget in self.button_frame.winfo_children():
             widget.destroy()
 
@@ -65,11 +70,11 @@ class App:
             fg=DARK_COLOR,
             font=FONT
         ).pack(BUTTON_DIRECTION)
-            
+
         tk.Button(
             self.button_frame,
             text="Salir",
-            command=self.root.destroy ,
+            command=self.root.destroy,
             width=BUTTON_WIDTH,
             bg=LIGHT_COLOR,
             fg=DARK_COLOR,
