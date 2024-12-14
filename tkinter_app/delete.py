@@ -8,7 +8,7 @@ def delete_record(display_frame, record_type):
     nueva_ventana.geometry(SIZE_SECOND_WINDOW)
     nueva_ventana.config(bg=LIGHT_COLOR)
 
-    tk.Label(nueva_ventana, text=f"Ingrese el valor de la clave primaria para eliminar:", bg=LIGHT_COLOR).pack()
+    tk.Label(nueva_ventana, text=f"Ingrese el valor de la clave primaria para eliminar :", bg=LIGHT_COLOR).pack()
     primary_key_entry = tk.Entry(nueva_ventana)
     primary_key_entry.pack()
 
