@@ -348,7 +348,387 @@ A continuación se presentan los diagramas que ilustran la estructura y el funci
             IMPRIMIR 'Error: ' + e
     FIN FUNCIÓN
 
+### Pseudocodigos - thinker_app
+      SI __name__ == "__main__" ENTONCES
+    root = tk.Tk()
+    app = App(root)
+    root.mainloop()
 
+FUNCION App(root):
+    self.root = root
+    self.root.geometry(SIZE_WINDOW)
+    self.root.title("Gestor De Datos")
+    self.root.configure(bg=DARK_COLOR)
+
+    self.button_frame = tk.Frame(self.root, bg=DARK_COLOR)
+    self.button_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10, pady=10)
+
+    self.display_frame = tk.Frame(self.root, bg=LIGHT_COLOR)
+    self.display_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+    self.crear_botones_principales()
+
+FUNCION crear_botones_principales(self):
+    PARA CADA widget EN self.button_frame.winfo_children() HACER
+        widget.destroy()
+
+    tk.Label(self.button_frame, text="Gestion de Datos", bg=DARK_COLOR, fg=LIGHT_COLOR, font=FONT).pack(BUTTON_DIRECTION)
+
+    tk.Button(
+        self.button_frame,
+        text="Visualizar registros",
+        command=lambda: see(self.button_frame, self.display_frame, types, self.crear_botones_principales),
+        width=BUTTON_WIDTH,
+        bg=LIGHT_COLOR,
+        fg=DARK_COLOR,
+        font=FONT
+    ).pack(BUTTON_DIRECTION)
+
+    tk.Button(
+        self.button_frame,
+        text="Agregar registros",
+        command=lambda: add(self.button_frame, self.display_frame, types, self.crear_botones_principales),
+        width=BUTTON_WIDTH,
+        bg=LIGHT_COLOR,
+        fg=DARK_COLOR,
+        font=FONT
+    ).pack(BUTTON_DIRECTION)
+
+    tk.Button(
+        self.button_frame,
+        text="Modificar registros",
+        command=lambda: mod(self.button_frame, self.display_frame, types, self.crear_botones_principales),
+        width=BUTTON_WIDTH,
+        bg=LIGHT_COLOR,
+        fg=DARK_COLOR,
+        font=FONT
+    ).pack(BUTTON_DIRECTION)
+
+    tk.Button(
+        self.button_frame,
+        text="Eliminar registros",
+        command=lambda: delete(self.button_frame, self.display_frame, types, self.crear_botones_principales),
+        width=BUTTON_WIDTH,
+        bg=LIGHT_COLOR,
+        fg=DARK_COLOR,
+        font=FONT
+    ).pack(BUTTON_DIRECTION)
+
+    tk.Button(
+        self.button_frame,
+        text="Salir",
+        command=self.root.destroy,
+        width=BUTTON_WIDTH,
+        bg=LIGHT_COLOR,
+        fg=DARK_COLOR,
+        font=FONT
+    ).pack(BUTTON_DIRECTION)
+
+FUNCION see(button_frame, display_frame, types, crear_botones_principales):
+    PARA CADA widget EN button_frame.winfo_children():
+        widget.destroy()
+
+    PARA CADA record_type EN types:
+        tk.Button(
+            button_frame,
+            text=record_type,
+            width=BUTTON_WIDTH,
+            bg=LIGHT_COLOR,
+            fg=DARK_COLOR,
+            font=FONT,
+            command=lambda rt=record_type: display_records(display_frame, rt)
+        ).pack(pady=10)
+
+    tk.Button(
+        button_frame,
+        text="Volver",
+        command=lambda: crear_botones_principales(),
+        bg=DARK_COLOR,
+        fg=LIGHT_COLOR,
+        font=FONT
+    ).pack(pady=10)
+
+FUNCION display_records(display_frame, record_type):
+    PARA CADA widget EN display_frame.winfo_children():
+        widget.destroy()
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    TRY:
+        cursor.execute(f"SELECT * FROM {record_type}")
+        records = cursor.fetchall()
+
+        headers = [desc[0] for desc in cursor.description]
+        header_frame = tk.Frame(display_frame, bg=LIGHT_COLOR)
+        header_frame.pack(fill=tk.X)
+
+        PARA CADA header EN headers:
+            tk.Label(header_frame, text=header, bg=LIGHT_COLOR, fg=DARK_COLOR, font=FONT, width=15).pack(side=tk.LEFT, padx=5)
+
+        PARA CADA record EN records:
+            row_frame = tk.Frame(display_frame, bg=LIGHT_COLOR)
+            row_frame.pack(fill=tk.X)
+            PARA CADA value EN record:
+                tk.Label(row_frame, text=str(value), bg=LIGHT_COLOR, fg=DARK_COLOR, font=FONT, width=15).pack(side=tk.LEFT, padx=5)
+
+    EXCEPT Exception AS e:
+        tk.Label(display_frame, text=f"Error: {str(e)}", bg=LIGHT_COLOR, fg="red", font=FONT).pack(pady=5)
+
+    cursor.close()
+    conn.close()
+
+FUNCION add(button_frame, display_frame, types, crear_botones_principales):
+    PARA CADA widget EN button_frame.winfo_children():
+        widget.destroy()
+
+    PARA CADA record_type EN types:
+        tk.Button(
+            button_frame,
+            text=record_type,
+            width=BUTTON_WIDTH,
+            bg=LIGHT_COLOR,
+            fg=DARK_COLOR,
+            font=FONT,
+            command=lambda rt=record_type: add_record(display_frame, rt)
+        ).pack(pady=10)
+
+    tk.Button(
+        button_frame,
+        text="Volver",
+        command=lambda: crear_botones_principales(),
+        bg=DARK_COLOR,
+        fg=LIGHT_COLOR,
+        font=FONT
+    ).pack(pady=10)
+
+FUNCION add_record(display_frame, record_type):
+    nueva_ventana = tk.Toplevel()
+    nueva_ventana.title("Agregar Registros")
+    nueva_ventana.geometry(SIZE_SECOND_WINDOW)
+    nueva_ventana.config(bg=LIGHT_COLOR)
+
+    inputs = []
+    TRY:
+        conn = connect_db()
+        cursor = conn.cursor()
+
+        cursor.execute(f"SELECT * FROM {record_type} WHERE 1=0")
+        headers = [desc[0] for desc in cursor.description]
+
+        PARA CADA header EN headers[:-1]:
+            tk.Label(nueva_ventana, text=f"{header}:", bg=LIGHT_COLOR).pack()
+            entry = tk.Entry(nueva_ventana)
+            entry.pack()
+            inputs.append(entry)
+
+    EXCEPT Exception AS e:
+        tk.Label(nueva_ventana, text=f"Error: {str(e)}", bg=LIGHT_COLOR, fg="red").pack()
+        RETURN
+
+    FUNCION submit():
+        values = [entry.get() for entry in inputs]
+        TRY:
+            modification_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            placeholders = ", ".join(["?" for _ in headers])
+            query = f"INSERT INTO {record_type} ({', '.join(headers)}) VALUES ({placeholders})"
+            cursor.execute(query, values + [modification_date])
+
+            SI record_type == "table1" ENTONCES:
+                other_table_query = "INSERT INTO other_table (column1, column2) VALUES (?, ?)"
+                cursor.execute(other_table_query, (values[0], values[1]))
+
+            conn.commit()
+            nueva_ventana.destroy()
+            display_records(display_frame, record_type)
+        EXCEPT Exception AS e:
+            tk.Label(nueva_ventana, text=f"Error: {str(e)}", bg=LIGHT_COLOR, fg="red").pack()
+
+    tk.Button(nueva_ventana, text="Agregar", command=submit).pack()
+    tk.Button(nueva_ventana, text="Cerrar", command=nueva_ventana.destroy).pack()
+
+    nueva_ventana.protocol("WM_DELETE_WINDOW", lambda: (cursor.close(), conn.close(), nueva_ventana.destroy()))
+
+FUNCION mod(button_frame, display_frame, types, crear_botones_principales):
+    PARA CADA widget EN button_frame.winfo_children():
+        widget.destroy()
+
+    PARA CADA record_type EN types:
+        tk.Button(
+            button_frame,
+            text=record_type,
+            width=BUTTON_WIDTH,
+            bg=LIGHT_COLOR,
+            fg=DARK_COLOR,
+            font=FONT,
+            command=lambda rt=record_type: mod_record(display_frame, rt)
+        ).pack(pady=10)
+
+    tk.Button(
+        button_frame,
+        text="Volver",
+        command=lambda: crear_botones_principales(),
+        bg=DARK_COLOR,
+        fg=LIGHT_COLOR,
+        font=FONT
+    ).pack(pady=10)
+
+FUNCION mod_record(display_frame, record_type):
+    nueva_ventana = tk.Toplevel()
+    nueva_ventana.title(f"Modificar {record_type}")
+    nueva_ventana.geometry(SIZE_SECOND_WINDOW)
+    nueva_ventana.config(bg=LIGHT_COLOR)
+
+    tk.Label(nueva_ventana, text=f"Ingrese el valor de la clave primaria para modificar:", bg=LIGHT_COLOR).pack()
+    primary_key_entry = tk.Entry(nueva_ventana)
+    primary_key_entry.pack()
+
+    inputs = []
+    TRY:
+        conn = connect_db()
+        cursor = conn.cursor()
+
+        cursor.execute(f"SELECT * FROM {record_type} WHERE 1=0")
+        headers = [desc[0] for desc in cursor.description]
+
+        PARA CADA header EN headers[1:-1]:
+            tk.Label(nueva_ventana, text=f"{header}:", bg=LIGHT_COLOR).pack()
+            entry = tk.Entry(nueva_ventana)
+            entry.pack()
+            inputs.append(entry)
+
+    EXCEPT Exception AS e:
+        tk.Label(nueva_ventana, text=f"Error: {str(e)}", bg=LIGHT_COLOR, fg="red").pack()
+        RETURN
+
+    FUNCION load_record():
+        TRY:
+            pk_value = primary_key_entry.get().strip()
+            SI NO pk_value:
+                RAISE ValueError("El valor de la clave primaria no puede estar vacío.")
+
+            cursor.execute(f"SELECT * FROM {record_type} WHERE {headers[0]} = ?", (pk_value,))
+            current_data = cursor.fetchone()
+
+            SI NO current_data:
+                RAISE ValueError(f"No se encontró ningún registro con {headers[0]} = {pk_value}")
+
+            PARA CADA entry, value EN zip(inputs, current_data[1:-1]):
+                entry.delete(0, tk.END)
+                entry.insert(0, value)
+
+        EXCEPT Exception AS e:
+            tk.Label(nueva_ventana, text=f"Error: {str(e)}", bg=LIGHT_COLOR, fg="red").pack()
+
+    FUNCION submit():
+        TRY:
+            values = [entry.get().strip() for entry in inputs]
+            SI ALGUN value == "" ENTONCES:
+                RAISE ValueError("Todos los campos son obligatorios.")
+
+            modification_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            values.append(modification_date)
+
+            set_clause = ", ".join([f"{header} = ?" for header in headers[1:-1]])
+            query = f"UPDATE {record_type} SET {set_clause}, modificacion = ? WHERE {headers[0]} = ?"
+
+            CON connect_db() COMO conn:
+                cursor = conn.cursor()
+                cursor.execute(query, values + [primary_key_entry.get().strip()])
+                conn.commit()
+
+            nueva_ventana.destroy()
+            display_records(display_frame, record_type)
+        EXCEPT Exception AS e:
+            tk.Label(nueva_ventana, text=f"Error: {str(e)}", bg=LIGHT_COLOR, fg="red").pack()
+
+    tk.Button(nueva_ventana, text="Cargar Registro", command=load_record).pack()
+    tk.Button(nueva_ventana, text="Modificar", command=submit).pack()
+    tk.Button(nueva_ventana, text="Cerrar", command=nueva_ventana.destroy).pack()
+
+    nueva_ventana.protocol("WM_DELETE_WINDOW", lambda: nueva_ventana.destroy())
+
+FUNCION delete(button_frame, display_frame, types, crear_botones_principales):
+    PARA CADA widget EN button_frame.winfo_children():
+        widget.destroy()
+
+    PARA CADA record_type EN types:
+        tk.Button(
+            button_frame,
+            text=record_type,
+            width=BUTTON_WIDTH,
+            bg=LIGHT_COLOR,
+            fg=DARK_COLOR,
+            font=FONT,
+            command=lambda rt=record_type: delete_record(display_frame, rt)
+        ).pack(pady=10)
+
+    tk.Button(
+        button_frame,
+        text="Volver",
+        command=lambda: crear_botones_principales(),
+        bg=DARK_COLOR,
+        fg=LIGHT_COLOR,
+        font=FONT
+    ).pack(pady=10)
+
+FUNCION delete_record(display_frame, record_type):
+    nueva_ventana = tk.Toplevel()
+    nueva_ventana.title(f"Eliminar {record_type}")
+    nueva_ventana.geometry(SIZE_SECOND_WINDOW)
+    nueva_ventana.config(bg=LIGHT_COLOR)
+
+    tk.Label(nueva_ventana, text=f"Ingrese el valor de la clave primaria para eliminar:", bg=LIGHT_COLOR).pack()
+    primary_key_entry = tk.Entry(nueva_ventana)
+    primary_key_entry.pack()
+
+    TRY:
+        conn = connect_db()
+        cursor = conn.cursor()
+
+        cursor.execute(f"SELECT * FROM {record_type} WHERE 1=0")
+        headers = [desc[0] for desc in cursor.description]
+
+    EXCEPT Exception AS e:
+        tk.Label(nueva_ventana, text=f"Error: {str(e)}", bg=LIGHT_COLOR, fg="red").pack()
+        RETURN
+
+    FUNCION submit():
+        TRY:
+            pk_value = primary_key_entry.get().strip()
+            SI NO pk_value:
+                RAISE ValueError("El valor de la clave primaria no puede estar vacío.")
+
+            CON connect_db() COMO conn:
+                cursor = conn.cursor()
+
+                related_tables = get_related_tables(record_type)
+                PARA CADA related_table EN related_tables:
+                    related_query = f"DELETE FROM {related_table} WHERE {headers[0]} = ?"
+                    cursor.execute(related_query, (pk_value,))
+
+                query = f"DELETE FROM {record_type} WHERE {headers[0]} = ?"
+                cursor.execute(query, (pk_value,))
+
+                conn.commit()
+
+            nueva_ventana.destroy()
+            display_records(display_frame, record_type)
+        EXCEPT Exception AS e:
+            tk.Label(nueva_ventana, text=f"Error: {str(e)}", bg=LIGHT_COLOR, fg="red").pack()
+
+    tk.Button(nueva_ventana, text="Eliminar", command=submit).pack()
+    tk.Button(nueva_ventana, text="Cerrar", command=nueva_ventana.destroy).pack()
+
+    nueva_ventana.protocol("WM_DELETE_WINDOW", lambda: nueva_ventana.destroy())
+
+   FUNCION get_related_tables(record_type):
+       related_tables = []
+       SI record_type == 'parent_table' ENTONCES:
+        related_tables = ['child_table']
+          RETURN related_tables
+          
+   root.mainloop()
 
 
 ## Colaboradoras
