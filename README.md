@@ -30,7 +30,9 @@ Se han implementado pruebas para asegurar que todas las funcionalidades de la in
      
      **Agregar**
      ![image](https://github.com/user-attachments/assets/5b35fa48-4587-4924-b32d-63eb39161929)
-     ![image](https://github.com/user-attachments/assets/4c43b2fb-a087-4fea-9701-233cdd9d5228)
+     ![image](https://github.com/user-attachments/assets/208d03f9-0851-43ab-9280-cce473b795e1)
+
+     
      **Modificar**
      ![image](https://github.com/user-attachments/assets/5031cc03-a6d9-4970-b9ca-da44747c17b4)
      ![image](https://github.com/user-attachments/assets/9bf8ebd5-8e94-4e0f-9807-e3b3272e5c91)
@@ -47,10 +49,11 @@ Se han implementado pruebas para asegurar que todas las funcionalidades de la in
 
 3. **Pruebas de Integridad de Datos**:
    - Verificación de que los cambios realizados desde la interfaz se reflejen correctamente en la base de datos.
-   - Confirmación de que los datos permanezcan consistentes tras varias operaciones.
+     ![image](https://github.com/user-attachments/assets/ff7e6c00-6997-4b3d-b2ef-2e8e7400a5b7)
 
 4. **Pruebas de Cierre de Conexión**:
    - Verificación de que la conexión a la base de datos se cierre correctamente al cerrar la aplicación.
+     ![image](https://github.com/user-attachments/assets/67977ba6-4d44-45ad-b3e8-00073162761d)
 
 ## Gráficos del Proyecto
 
