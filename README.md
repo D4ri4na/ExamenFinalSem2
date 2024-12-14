@@ -46,14 +46,20 @@ A continuación se presentan los diagramas que ilustran la estructura y el funci
 - **Modelo de Entidad-Relación**:
   <img src="graficos/modelo_E-T.jpeg" alt="Modelo de Entidad-Relación" width="300" style="display: block; margin: auto;">
 
-- **Diagrama de Clases**:
-  <img src="graficos/Class_diagram/Class_interfaz.jpeg" alt="Diagrama de Clases - Interfaz" width="300" style="display: block; margin: auto;">
-  <img src="graficos/Class_diagram/migrate_data.jpg" alt="Diagrama de Clases - Migración de Datos" width="300" style="display: block; margin: auto;">
-  <img src="graficos/Class_diagram/MySQL_connection.jpg" alt="Diagrama de Clases - Conexión MySQL" width="300" style="display: block; margin: auto;">
-  <img src="graficos/Class_diagram/SQLserver_connection.jpg" alt="Diagrama de Clases - Conexión SQL Server" width="300" style="display: block; margin: auto;">
+### Diagrama de Clases - Interfaz
+<img src="graficos/Class_diagram/Class_interfaz.jpeg" alt="Diagrama de Clases - Interfaz" width="300" style="display: block; margin: auto;">
 
-- **Diagramas de Flujo**:
-  <img src="graficos/Class_diagram/Class_interfaz.jpeg" alt="Diagrama de Flujo" width="300" style="display: block; margin: auto;">
+### Diagrama de Clases - Migración de Datos
+<img src="graficos/Class_diagram/migrate_data.jpg" alt="Diagrama de Clases - Migración de Datos" width="300" style="display: block; margin: auto;">
+
+### Diagrama de Clases - Conexión MySQL
+<img src="graficos/Class_diagram/MySQL_connection.jpg" alt="Diagrama de Clases - Conexión MySQL" width="300" style="display: block; margin: auto;">
+
+### Diagrama de Clases - Conexión SQL Server
+<img src="graficos/Class_diagram/SQLserver_connection.jpg" alt="Diagrama de Clases - Conexión SQL Server" width="300" style="display: block; margin: auto;">
+
+### Diagramas de Flujo
+<img src="graficos/Class_diagram/Class_interfaz.jpeg" alt="Diagrama de Flujo" width="300" style="display: block; margin: auto;">
 
 ## Colaboradoras
 
