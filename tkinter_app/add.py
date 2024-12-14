@@ -18,7 +18,7 @@ def add_record(display_frame, record_type):
         headers = [desc[0] for desc in cursor.description]
 
         #Crear entradas de datos
-        for header in headers[:-1]:  #Excluir la última columna donde se almacenaran las fechas
+        for header in headers[:-1]:  #Excluir la última columna donde se almacenaran las fecha
             tk.Label(nueva_ventana, text=f"{header}:", bg=LIGHT_COLOR).pack()
             entry = tk.Entry(nueva_ventana)
             entry.pack()
