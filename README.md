@@ -58,7 +58,7 @@ A continuación se presentan los diagramas que ilustran la estructura y el funci
 ### Diagrama de Clases - Conexión SQL Server
 <img src="graficos/Class_diagram/SQLserver_connection.jpg" alt="Diagrama de Clases - Conexión SQL Server" width="300" style="display: block; margin: auto;">
 
-### Pseudocodigo - Migracion
+### Pseudocodigo - value_migrate
     FUNCIÓN migrate_data
         mysql_conn = CONEXIÓN_MYSQL()
         mssql_conn = CONEXIÓN_MSSQL()
@@ -231,6 +231,124 @@ A continuación se presentan los diagramas que ilustran la estructura y el funci
             mysql_conn.cerrar()
             mssql_conn.cerrar()
     FIN FUNCIÓN
+
+### Pseudocodigos - Clase: mysql_connection
+    // Método para conectar a la base de datos MySQL
+    FUNCIÓN connect
+        TRATAR
+            self.connection = CONECTAR_A_MYSQL(CONFIGURACIÓN_MYSQL)
+            SI self.connection.está_conectado() ENTONCES
+                IMPRIMIR 'Conectado a la base de datos MySQL'
+        EXCEPTO ERROR COMO e
+            IMPRIMIR 'Error: ' + e
+    FIN FUNCIÓN
+
+    // Método para cerrar la conexión a la base de datos MySQL
+    FUNCIÓN close
+        SI self.connection NO ES NULO ENTONCES
+            self.connection.cerrar()
+            IMPRIMIR 'Conexión a MySQL cerrada'
+    FIN FUNCIÓN
+
+    // Método para ejecutar una consulta SQL y devolver los resultados
+    FUNCIÓN execute_query(consulta)
+        TRATAR
+            cursor = self.connection.cursor(diccionario=VERDADERO)
+            cursor.ejecutar(consulta)
+            resultado = cursor.obtener_todos()
+            RETORNAR resultado
+        EXCEPTO ERROR COMO e
+            IMPRIMIR 'Error: ' + e
+            RETORNAR NULO
+    FIN FUNCIÓN
+
+    // Método para ejecutar una consulta SQL de actualización (INSERT, UPDATE, DELETE)
+    FUNCIÓN execute_update(consulta)
+        TRATAR
+            cursor = self.connection.cursor()
+            cursor.ejecutar(consulta)
+            self.connection.confirmar()
+        EXCEPTO ERROR COMO e
+            IMPRIMIR 'Error: ' + e
+    FIN FUNCIÓN
+
+### Pseudocodigos - mssql_connection
+    // Método para conectar a la base de datos MS SQL Server
+    FUNCIÓN connect
+        TRATAR
+            // Conectar a la base de datos maestra para crear una nueva base de datos
+            self.connection = CONECTAR_A_MSSQL(
+                "DRIVER=" + MSSQL_CONFIG['driver'] + "; " +
+                "SERVER=" + MSSQL_CONFIG['server'] + ";" +
+                "DATABASE=master;" +
+                "Trusted_Connection=" + MSSQL_CONFIG['trusted_connection'] + ";"
+            )
+            IMPRIMIR 'Conectado a la base de datos maestra de MS SQL Server'
+
+            // Crear la base de datos si no existe
+            database_name = MYSQL_CONFIG['database']
+            create_db_query = """
+            IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = '""" + database_name + """')
+            BEGIN
+                CREATE DATABASE [""" + database_name + """];
+            END;
+            """
+
+            // Usar una conexión separada para crear la base de datos
+            CON CONEXIÓN_TEMPORAL = CONECTAR_A_MSSQL(
+                "DRIVER=" + MSSQL_CONFIG['driver'] + "; " +
+                "SERVER=" + MSSQL_CONFIG['server'] + ";" +
+                "DATABASE=master;" +
+                "Trusted_Connection=" + MSSQL_CONFIG['trusted_connection'] + ";",
+                autocommit=VERDADERO  // Establecer autocommit en True
+            ) COMO temp_connection:
+                cursor = temp_connection.cursor()
+                cursor.ejecutar(create_db_query)
+                // IMPRIMIR 'Base de datos ' + database_name + ' creada o ya existe'
+
+            // Reconectar a la base de datos recién creada o existente
+            self.connection = CONECTAR_A_MSSQL(
+                "DRIVER=" + MSSQL_CONFIG['driver'] + "; " +
+                "SERVER=" + MSSQL_CONFIG['server'] + ";" +
+                "DATABASE=" + database_name + ";" +
+                "Trusted_Connection=" + MSSQL_CONFIG['trusted_connection'] + ";"
+            )
+            IMPRIMIR 'Conectado a la base de datos ' + database_name + ' de MS SQL Server'
+
+        EXCEPTO ERROR COMO e
+            IMPRIMIR 'Error: ' + e
+    FIN FUNCIÓN
+
+    // Método para cerrar la conexión a la base de datos MS SQL Server
+    FUNCIÓN close
+        SI self.connection NO ES NULO ENTONCES
+            self.connection.cerrar()
+            IMPRIMIR 'Conexión a MS SQL Server cerrada'
+    FIN FUNCIÓN
+
+    // Método para ejecutar una consulta SQL y devolver los resultados
+    FUNCIÓN execute_query(consulta)
+        TRATAR
+            cursor = self.connection.cursor()
+            cursor.ejecutar(consulta)
+            resultado = cursor.obtener_todos()
+            RETORNAR resultado
+        EXCEPTO ERROR COMO e
+            IMPRIMIR 'Error: ' + e
+            RETORNAR NULO
+    FIN FUNCIÓN
+
+    // Método para ejecutar una consulta SQL de actualización (INSERT, UPDATE, DELETE)
+    FUNCIÓN execute_update(consulta)
+        TRATAR
+            cursor = self.connection.cursor()
+            cursor.ejecutar(consulta)
+            self.connection.confirmar()
+        EXCEPTO ERROR COMO e
+            IMPRIMIR 'Error: ' + e
+    FIN FUNCIÓN
+
+
 
 
 ## Colaboradoras
