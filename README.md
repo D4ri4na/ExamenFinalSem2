@@ -25,6 +25,8 @@ Se han implementado pruebas para asegurar que todas las funcionalidades de la in
 
 1. **Pruebas de las Acciones Principales**:
    - Verificación de que los datos se muestren correctamente en la interfaz.
+     ![image](https://github.com/user-attachments/assets/db1119a3-2800-4137-89c9-e88df68eca37)
+
    - Confirmación de que las operaciones de adición, modificación y eliminación actualicen la base de datos.
    - Validación de que la búsqueda devuelva los resultados esperados.
 
