@@ -26,13 +26,23 @@ Se han implementado pruebas para asegurar que todas las funcionalidades de la in
 1. **Pruebas de las Acciones Principales**:
    - Verificación de que los datos se muestren correctamente en la interfaz.
      ![image](https://github.com/user-attachments/assets/db1119a3-2800-4137-89c9-e88df68eca37)
-
    - Confirmación de que las operaciones de adición, modificación y eliminación actualicen la base de datos.
-   - Validación de que la búsqueda devuelva los resultados esperados.
+     **Agregar**
+     ![image](https://github.com/user-attachments/assets/5b35fa48-4587-4924-b32d-63eb39161929)
+     ![image](https://github.com/user-attachments/assets/4c43b2fb-a087-4fea-9701-233cdd9d5228)
+     **Modificar**
+     ![image](https://github.com/user-attachments/assets/5031cc03-a6d9-4970-b9ca-da44747c17b4)
+     ![image](https://github.com/user-attachments/assets/9bf8ebd5-8e94-4e0f-9807-e3b3272e5c91)
+     **Eliminar**
+     ![image](https://github.com/user-attachments/assets/088da59c-db4a-47bd-8a6a-6c2e0ccb111e)
+     ![image](https://github.com/user-attachments/assets/6f4e6a33-550b-40c0-bae3-930e5eeb904f)
 
 2. **Validación de Entradas**:
    - Manejo adecuado de errores de entrada (campos vacíos, formatos incorrectos, etc.).
+     ![image](https://github.com/user-attachments/assets/249b5bff-a72b-4518-a324-327ce337c881)
    - Mensajes claros en caso de errores.
+     ![image](https://github.com/user-attachments/assets/cb9b2672-c249-4e4c-a0c4-7e1934a1780e)
+
 
 3. **Pruebas de Integridad de Datos**:
    - Verificación de que los cambios realizados desde la interfaz se reflejen correctamente en la base de datos.
