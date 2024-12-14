@@ -8,7 +8,7 @@ Este proyecto tiene como objetivo modernizar un sistema heredado que gestiona da
 
 ### 1. Migración de Datos
 
-El sistema incluye un script en Python que permite migrar datos de una base de datos MySQL a una nueva base de datos en SQL server. Dentro de la carpeta mysql_to_sqlserver estan cuatro archivos, en archivo llamado config.py se modifican las credencias de MySQL y SQL server para poner hacer la migracion, en mssql_connection.py se conecta a SQL server y dentro de mysql_connection.py se conecta a MySQL. Finalmente en la carpeta value_migrate.py ocurre la migracion estableciendo una conexión con la base de datos al iniciar y la cierra al salir, manejando errores.
+El sistema incluye un script en Python que permite migrar datos de una base de datos MySQL a una nueva base de datos en SQL Server. Dentro de la carpeta `mysql_to_sqlserver` están cuatro archivos; en el archivo llamado `config.py` se modifican las credenciales de MySQL y SQL Server para realizar la migración. En `mssql_connection.py` se conecta a SQL Server y en `mysql_connection.py` se conecta a MySQL. Finalmente, en `value_migrate.py` ocurre la migración, estableciendo una conexión con la base de datos al iniciar y cerrándola al salir, manejando errores.
 
 ### 2. Interfaz de Usuario con Python Tkinter
 
@@ -44,19 +44,16 @@ Se han implementado pruebas para asegurar que todas las funcionalidades de la in
 A continuación se presentan los diagramas que ilustran la estructura y el funcionamiento del sistema:
 
 - **Modelo de Entidad-Relación**:
-  ![Modelo de Entidad-Relación](graficos/modelo_E-T.jpeg) 
-##
+  <img src="graficos/modelo_E-T.jpeg" alt="Modelo de Entidad-Relación" width="300" style="display: block; margin: auto;">
 
 - **Diagrama de Clases**:
-  ![Diagrama de Clases](graficos/Class_diagram/Class_interfaz.jpeg)
-  ![Diagrama de Clases](graficos/Class_diagram/migrate_data.jpg)
-  ![Diagrama de Clases](graficos/Class_diagram/MySQL_connection.jpg)
-  ![Diagrama de Clases](graficos/Class_diagram/SQLserver_connection.jpg)
-##
+  <img src="graficos/Class_diagram/Class_interfaz.jpeg" alt="Diagrama de Clases - Interfaz" width="300" style="display: block; margin: auto;">
+  <img src="graficos/Class_diagram/migrate_data.jpg" alt="Diagrama de Clases - Migración de Datos" width="300" style="display: block; margin: auto;">
+  <img src="graficos/Class_diagram/MySQL_connection.jpg" alt="Diagrama de Clases - Conexión MySQL" width="300" style="display: block; margin: auto;">
+  <img src="graficos/Class_diagram/SQLserver_connection.jpg" alt="Diagrama de Clases - Conexión SQL Server" width="300" style="display: block; margin: auto;">
 
 - **Diagramas de Flujo**:
-  ![Diagrama de Flujo](graficos/Class_diagram/Class_interfaz.jpeg)
-
+  <img src="graficos/Class_diagram/Class_interfaz.jpeg" alt="Diagrama de Flujo" width="300" style="display: block; margin: auto;">
 
 ## Colaboradoras
 
