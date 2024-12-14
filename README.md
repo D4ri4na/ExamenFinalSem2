@@ -59,179 +59,178 @@ A continuación se presentan los diagramas que ilustran la estructura y el funci
 <img src="graficos/Class_diagram/SQLserver_connection.jpg" alt="Diagrama de Clases - Conexión SQL Server" width="300" style="display: block; margin: auto;">
 
 ### Pseudocodigo - Migracion
-FUNCIÓN migrate_data
-    mysql_conn = CONEXIÓN_MYSQL()
-    mssql_conn = CONEXIÓN_MSSQL()
+    FUNCIÓN migrate_data
+        mysql_conn = CONEXIÓN_MYSQL()
+        mssql_conn = CONEXIÓN_MSSQL()
 
-    TRATAR
-        mysql_conn.conectar()
-        mssql_conn.conectar()
+        TRATAR
+            mysql_conn.conectar()
+            mssql_conn.conectar()
 
-        db_name = CONFIGURACIÓN_MYSQL['database']
-        use_db_query = "USE " + db_name + ";"
-        mssql_conn.ejecutar_actualización(use_db_query)
+            db_name = CONFIGURACIÓN_MYSQL['database']
+            use_db_query = "USE " + db_name + ";"
+            mssql_conn.ejecutar_actualización(use_db_query)
 
-        // Verificar si la base de datos MS SQL Server está vacía
-        check_empty_db_query = "SELECT COUNT(*) AS TotalTablas FROM INFORMATION_SCHEMA.TABLES;"
-        resultado = mssql_conn.ejecutar_consulta(check_empty_db_query)
-        tablas_db = resultado[0]
+            // Verificar si la base de datos MS SQL Server está vacía
+            check_empty_db_query = "SELECT COUNT(*) AS TotalTablas FROM INFORMATION_SCHEMA.TABLES;"
+            resultado = mssql_conn.ejecutar_consulta(check_empty_db_query)
+            tablas_db = resultado[0]
 
-        // Asegúrate de que el resultado sea una lista de diccionarios
-        SI tablas_db[0] == 0 ENTONCES
-            // Obtener nombres de tablas de MySQL
-            tablas = mysql_conn.ejecutar_consulta("SHOW TABLES;")
-            IMPRIMIR "Tablas recuperadas de MySQL: " + tablas
+            // Asegúrate de que el resultado sea una lista de diccionarios
+            SI tablas_db[0] == 0 ENTONCES
+                // Obtener nombres de tablas de MySQL
+                tablas = mysql_conn.ejecutar_consulta("SHOW TABLES;")
+                IMPRIMIR "Tablas recuperadas de MySQL: " + tablas
 
-            foreign_keys_list = []
+                foreign_keys_list = []
 
-            // Iniciar transacción
-            mssql_conn.ejecutar_actualización("BEGIN TRANSACTION;")
-
-            TRATAR
-                PARA CADA tabla EN tablas HACER
-                    table_name = tabla['Tables_in_' + db_name]
-                    IMPRIMIR "Migrando tabla: " + table_name
-
-                    // Verificar si la tabla existe en MS SQL Server
-                    table_exists_query = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" + table_name + "';"
-                    table_exists = mssql_conn.ejecutar_consulta(table_exists_query)
-
-                    SI NO table_exists ENTONCES
-                        // Obtener esquema de tabla de MySQL
-                        schema_query = "SHOW COLUMNS FROM " + table_name + ";"
-                        columnas = mysql_conn.ejecutar_consulta(schema_query)
-
-                        // Obtener información de clave primaria
-                        primary_key_query = "SHOW KEYS FROM " + table_name + " WHERE Key_name = 'PRIMARY';"
-                        primary_keys = mysql_conn.ejecutar_consulta(primary_key_query)
-
-                        // Obtener información de clave foránea
-                        foreign_key_query = """
-                            SELECT
-                                kcu.constraint_name,
-                                kcu.table_name,
-                                kcu.column_name,
-                                kcu.referenced_table_name,
-                                kcu.referenced_column_name
-                            FROM
-                                information_schema.table_constraints AS tc
-                                JOIN information_schema.key_column_usage AS kcu
-                                ON tc.constraint_name = kcu.constraint_name
-                                AND tc.table_schema = kcu.table_schema
-                            WHERE
-                                tc.constraint_type = 'FOREIGN KEY' AND
-                                tc.table_name = '""" + table_name + """';
-                        """
-                        foreign_keys = mysql_conn.ejecutar_consulta(foreign_key_query)
-
-                        // Verificar si la tabla tiene claves foráneas
-                        SI foreign_keys ENTONCES
-                            foreign_keys_list.extend(foreign_keys)
-
-                        // Crear tabla en MS SQL Server con tipos de datos corregidos
-                        create_table_query = "CREATE TABLE " + table_name + " ("
-                        PARA CADA columna EN columnas HACER
-                            col_name = columna['Field']
-                            col_type = columna['Type']
-
-                            // Mapear tipo de datos de MySQL a tipo de datos de SQL Server
-                            col_type_parts = col_type.split('(')
-                            base_type = col_type_parts[0]
-                            mapped_type = data_type_mapping.get(base_type, 'VARCHAR')
-
-                            SI LONGITUD(col_type_parts) > 1 ENTONCES
-                                // Manejar tipos con especificación de longitud
-                                longitud = col_type_parts[1].replace(')', '')
-                                mapped_type += "(" + longitud + ")"
-
-                            create_table_query += col_name + " " + mapped_type + ", "
-
-                        // Agregar restricción de clave primaria
-                        SI primary_keys ENTONCES
-                            primary_key_columns = [key['Column_name'] PARA key EN primary_keys]
-                            primary_key_constraint = "PRIMARY KEY (" + ', '.join(primary_key_columns) + ")"
-                            create_table_query += primary_key_constraint
-
-                        create_table_query = create_table_query.rstrip(', ') + ");"
-                        mssql_conn.ejecutar_actualización(create_table_query)
-
-            EXCEPTO EXCEPCIÓN COMO e
-                // Revertir transacción en caso de error
-                mssql_conn.ejecutar_actualización("ROLLBACK;")
-                IMPRIMIR "Error durante la creación de la tabla o la adición de claves foráneas: " + e
-                RETORNAR
-
-            // Insertar datos en las tablas
-            PARA CADA tabla EN tablas HACER
-                table_name = tabla['Tables_in_' + db_name]
-                IMPRIMIR "Insertando datos en la tabla: " + table_name
-
-                // Obtener datos de MySQL
-                data_query = "SELECT * FROM " + table_name + ";"
-                datos = mysql_conn.ejecutar_consulta(data_query)
-
-                // Insertar datos en MS SQL Server
-                PARA CADA fila EN datos HACER
-                    insert_query = "INSERT INTO " + table_name + " VALUES ("
-                    PARA CADA valor EN fila.values() HACER
-                        SI TIPO(valor) ES CADENA ENTONCES
-                            insert_query += "'" + valor.replace("'", "''") + "', "  // Escapar comillas simples
-                        SINO
-                            insert_query += "'" + valor + "', "
-                    insert_query = insert_query.rstrip(', ') + ");"
-                    TRATAR
-                        mssql_conn.ejecutar_actualización(insert_query)
-                    EXCEPTO EXCEPCIÓN COMO e
-                        IMPRIMIR "Error: " + e  // Mostrar el error pero continuar con el siguiente registro
-
-            // Agregar restricciones de clave foránea a MS SQL Server
-            PARA CADA fk EN foreign_keys_list HACER
-                constraint_name = fk['CONSTRAINT_NAME']
-                table_name = fk['TABLE_NAME']
-                column_name = fk['COLUMN_NAME']
-                referenced_table_name = fk['REFERENCED_TABLE_NAME']
-                referenced_column_name = fk['REFERENCED_COLUMN_NAME']
-
-                alter_table_query = """
-                ALTER TABLE """ + table_name + """
-                ADD CONSTRAINT """ + constraint_name + """
-                FOREIGN KEY (""" + column_name + """)
-                REFERENCES """ + referenced_table_name + """ (""" + referenced_column_name + """);
-                """
+                // Iniciar transacción
+                mssql_conn.ejecutar_actualización("BEGIN TRANSACTION;")
 
                 TRATAR
-                    mssql_conn.ejecutar_actualización(alter_table_query)
-                    IMPRIMIR "Restricción de clave foránea agregada exitosamente a la tabla '" + table_name + "'."
+                    PARA CADA tabla EN tablas HACER
+                        table_name = tabla['Tables_in_' + db_name]
+                        IMPRIMIR "Migrando tabla: " + table_name
+
+                        // Verificar si la tabla existe en MS SQL Server
+                        table_exists_query = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" + table_name + "';"
+                        table_exists = mssql_conn.ejecutar_consulta(table_exists_query)
+
+                        SI NO table_exists ENTONCES
+                            // Obtener esquema de tabla de MySQL
+                            schema_query = "SHOW COLUMNS FROM " + table_name + ";"
+                            columnas = mysql_conn.ejecutar_consulta(schema_query)
+
+                            // Obtener información de clave primaria
+                            primary_key_query = "SHOW KEYS FROM " + table_name + " WHERE Key_name = 'PRIMARY';"
+                            primary_keys = mysql_conn.ejecutar_consulta(primary_key_query)
+
+                            // Obtener información de clave foránea
+                            foreign_key_query = """
+                                SELECT
+                                    kcu.constraint_name,
+                                    kcu.table_name,
+                                    kcu.column_name,
+                                    kcu.referenced_table_name,
+                                    kcu.referenced_column_name
+                                FROM
+                                    information_schema.table_constraints AS tc
+                                    JOIN information_schema.key_column_usage AS kcu
+                                    ON tc.constraint_name = kcu.constraint_name
+                                    AND tc.table_schema = kcu.table_schema
+                                WHERE
+                                    tc.constraint_type = 'FOREIGN KEY' AND
+                                    tc.table_name = '""" + table_name + """';
+                            """
+                            foreign_keys = mysql_conn.ejecutar_consulta(foreign_key_query)
+
+                            // Verificar si la tabla tiene claves foráneas
+                            SI foreign_keys ENTONCES
+                                foreign_keys_list.extend(foreign_keys)
+
+                            // Crear tabla en MS SQL Server con tipos de datos corregidos
+                            create_table_query = "CREATE TABLE " + table_name + " ("
+                            PARA CADA columna EN columnas HACER
+                                col_name = columna['Field']
+                                col_type = columna['Type']
+
+                                // Mapear tipo de datos de MySQL a tipo de datos de SQL Server
+                                col_type_parts = col_type.split('(')
+                                base_type = col_type_parts[0]
+                                mapped_type = data_type_mapping.get(base_type, 'VARCHAR')
+
+                                SI LONGITUD(col_type_parts) > 1 ENTONCES
+                                    // Manejar tipos con especificación de longitud
+                                    longitud = col_type_parts[1].replace(')', '')
+                                    mapped_type += "(" + longitud + ")"
+
+                                create_table_query += col_name + " " + mapped_type + ", "
+
+                            // Agregar restricción de clave primaria
+                            SI primary_keys ENTONCES
+                                primary_key_columns = [key['Column_name'] PARA key EN primary_keys]
+                                primary_key_constraint = "PRIMARY KEY (" + ', '.join(primary_key_columns) + ")"
+                                create_table_query += primary_key_constraint
+
+                            create_table_query = create_table_query.rstrip(', ') + ");"
+                            mssql_conn.ejecutar_actualización(create_table_query)
+
                 EXCEPTO EXCEPCIÓN COMO e
-                    IMPRIMIR "Error al agregar restricción de clave foránea a la tabla '" + table_name + "': " + e
+                    // Revertir transacción en caso de error
+                    mssql_conn.ejecutar_actualización("ROLLBACK;")
+                    IMPRIMIR "Error durante la creación de la tabla o la adición de claves foráneas: " + e
+                    RETORNAR
 
-            // Agregar columna "modificación" a cada tabla existente
-            PARA CADA tabla EN tablas HACER
-                table_name = tabla['Tables_in_' + db_name]
-                IMPRIMIR "Agregando columna 'modificación' a la tabla: " + table_name
+                // Insertar datos en las tablas
+                PARA CADA tabla EN tablas HACER
+                    table_name = tabla['Tables_in_' + db_name]
+                    IMPRIMIR "Insertando datos en la tabla: " + table_name
 
-                // Verificar si la columna ya existe
-                check_column_query = """
-                    SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-                    WHERE TABLE_NAME = '""" + table_name + """' AND COLUMN_NAME = 'modificacion';
-                """
-                column_exists = mssql_conn.ejecutar_consulta(check_column_query)
+                    // Obtener datos de MySQL
+                    data_query = "SELECT * FROM " + table_name + ";"
+                    datos = mysql_conn.ejecutar_consulta(data_query)
 
-                SI NO column_exists ENTONCES
-                    alter_table_query = "ALTER TABLE " + table_name + " ADD modificacion DATETIME;"
+                    // Insertar datos en MS SQL Server
+                    PARA CADA fila EN datos HACER
+                        insert_query = "INSERT INTO " + table_name + " VALUES ("
+                        PARA CADA valor EN fila.values() HACER
+                            SI TIPO(valor) ES CADENA ENTONCES
+                                insert_query += "'" + valor.replace("'", "''") + "', "  // Escapar comillas simples
+                            SINO
+                                insert_query += "'" + valor + "', "
+                        insert_query = insert_query.rstrip(', ') + ");"
+                        TRATAR
+                            mssql_conn.ejecutar_actualización(insert_query)
+                        EXCEPTO EXCEPCIÓN COMO e
+                            IMPRIMIR "Error: " + e  // Mostrar el error pero continuar con el siguiente registro
+
+                // Agregar restricciones de clave foránea a MS SQL Server
+                PARA CADA fk EN foreign_keys_list HACER
+                    constraint_name = fk['CONSTRAINT_NAME']
+                    table_name = fk['TABLE_NAME']
+                    column_name = fk['COLUMN_NAME']
+                    referenced_table_name = fk['REFERENCED_TABLE_NAME']
+                    referenced_column_name = fk['REFERENCED_COLUMN_NAME']
+
+                    alter_table_query = """
+                    ALTER TABLE """ + table_name + """
+                    ADD CONSTRAINT """ + constraint_name + """
+                    FOREIGN KEY (""" + column_name + """)
+                    REFERENCES """ + referenced_table_name + """ (""" + referenced_column_name + """);
+                    """
+
                     TRATAR
                         mssql_conn.ejecutar_actualización(alter_table_query)
-                        IMPRIMIR "Columna 'modificación' agregada a la tabla: " + table_name
+                        IMPRIMIR "Restricción de clave foránea agregada exitosamente a la tabla '" + table_name + "'."
                     EXCEPTO EXCEPCIÓN COMO e
-                        IMPRIMIR "Error al agregar columna 'modificación' a la tabla " + table_name + ": " + e
+                        IMPRIMIR "Error al agregar restricción de clave foránea a la tabla '" + table_name + "': " + e
 
-    EXCEPTO EXCEPCIÓN COMO e
-        IMPRIMIR "Error durante la migración: " + e
-    FINALMENTE
-        mysql_conn.cerrar()
-        mssql_conn.cerrar()
-FIN FUNCIÓN
+                // Agregar columna "modificación" a cada tabla existente
+                PARA CADA tabla EN tablas HACER
+                    table_name = tabla['Tables_in_' + db_name]
+                    IMPRIMIR "Agregando columna 'modificación' a la tabla: " + table_name
 
+                    // Verificar si la columna ya existe
+                    check_column_query = """
+                        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+                        WHERE TABLE_NAME = '""" + table_name + """' AND COLUMN_NAME = 'modificacion';
+                    """
+                    column_exists = mssql_conn.ejecutar_consulta(check_column_query)
+
+                    SI NO column_exists ENTONCES
+                        alter_table_query = "ALTER TABLE " + table_name + " ADD modificacion DATETIME;"
+                        TRATAR
+                            mssql_conn.ejecutar_actualización(alter_table_query)
+                            IMPRIMIR "Columna 'modificación' agregada a la tabla: " + table_name
+                        EXCEPTO EXCEPCIÓN COMO e
+                            IMPRIMIR "Error al agregar columna 'modificación' a la tabla " + table_name + ": " + e
+
+        EXCEPTO EXCEPCIÓN COMO e
+            IMPRIMIR "Error durante la migración: " + e
+        FINALMENTE
+            mysql_conn.cerrar()
+            mssql_conn.cerrar()
+    FIN FUNCIÓN
 
 
 ## Colaboradoras
