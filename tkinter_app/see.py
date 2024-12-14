@@ -10,7 +10,7 @@ def display_records(display_frame, record_type):
     cursor = conn.cursor()
 
     try:
-        cursor.execute(f"SELECT * FROM {record_type}")
+        cursor.execute(f"SELECT * FROM {record_type} ")
         records = cursor.fetchall()
 
         headers = [desc[0] for desc in cursor.description]
