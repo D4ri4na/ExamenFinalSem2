@@ -7,7 +7,7 @@ from const import *
 class App:
     def __init__(self, root):
         """
-        Inicializa la aplicación con la ventana principal y configura los marcos para los botones y la visualización.
+        Inicializa la aplicación con la ventana principal y configura los marcos para los botones y la visualización
         """
         self.root = root
         self.root.geometry(SIZE_WINDOW)
