@@ -1,3 +1,4 @@
+
 MYSQL_CONFIG = {
 'host': 'localhost',
 'user': 'root',
@@ -5,11 +6,8 @@ MYSQL_CONFIG = {
 'database': 'bookstore'
 }
 
-
 MSSQL_CONFIG = {
-        "Driver={ODBC Driver 17 for SQL Server};"
-        "Server=MSI\\MSSQLSERVER01;"
-        "Database=bookstore;"
-        "Trusted_Connection=yes;"
+'driver': 'ODBC Driver 17 for SQL Server',
+'server': 'MSI\\MSSQLSERVER01',
+'trusted_connection': 'yes'
 }
-
