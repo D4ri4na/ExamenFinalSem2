@@ -56,7 +56,7 @@ def migrate_data():
         # print(f" the result: {tables_db}")
 
         # Asegúrate de que el resultado sea una lista de diccionarios
-        if tables_db[0] == 0: 
+        if tables_db[0] == 0:
             # Obtener nombres de tablas de MySQL
             tables = mysql_conn.execute_query("SHOW TABLES;")
             print(f"Tablas recuperadas de MySQL: {tables}")
@@ -186,6 +186,21 @@ def migrate_data():
                     print(f"Restricción de clave foránea agregada exitosamente a la tabla '{table_name}'.")
                 except Exception as e:
                     print(f"Error al agregar restricción de clave foránea a la tabla '{table_name}': {e}")
+
+            # Agregar columna "recursiva" a cada tabla GENRE
+            check_column_query = """
+                SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME = 'GENRE' AND COLUMN_NAME = 'recursiva';
+            """
+            column_exists = mssql_conn.execute_query(check_column_query)
+
+            if not column_exists:
+                alter_table_query = "ALTER TABLE GENRE ADD recursiva VARCHAR(255);"
+                try:
+                    mssql_conn.execute_update(alter_table_query)
+                    print('Columna "recursiva" agregada a la tabla: GENRE')
+                except Exception as e:
+                    print(f'Error al agregar columna "recursiva" a la tabla GENRE: {e}')
 
             # Agregar columna "modificación" a cada tabla existente
             for table in tables:

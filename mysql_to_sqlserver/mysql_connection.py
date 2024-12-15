@@ -59,4 +59,3 @@ class MySQLConnection:
 
 #test = MySQLConnection()
 #test.connect()
-

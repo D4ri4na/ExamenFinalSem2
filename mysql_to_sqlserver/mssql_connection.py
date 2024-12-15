@@ -46,7 +46,7 @@ class MSSQLConnection:
             ) as temp_connection:
                 cursor = temp_connection.cursor()
                 cursor.execute(create_db_query)
-                # print(f'Base de datos {database_name} creada o ya existe')
+                print(f'Base de datos {database_name} creada o ya existe')
 
             # Reconectar a la base de datos recién creada o existente
             self.connection = pyodbc.connect(
@@ -91,4 +91,3 @@ class MSSQLConnection:
             self.connection.commit()
         except pyodbc.Error as e:
             print(f'Error: {e}')
-
