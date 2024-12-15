@@ -55,11 +55,14 @@ def migrate_data():
         tables_db = result[0]
         # print(f" the result: {tables_db}")
 
-        # Asegúrate de que el resultado sea una lista de diccionarios
-        if tables_db[0] == 0:
+        tables_mysql = mysql_conn.execute_query("SHOW TABLES;")
+        tables_sqlserver = mssql_conn.execute_query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';")
+
+
+        if tables_db[0] == 0: 
             # Obtener nombres de tablas de MySQL
-            tables = mysql_conn.execute_query("SHOW TABLES;")
-            print(f"Tablas recuperadas de MySQL: {tables}")
+            #tables = mysql_conn.execute_query("SHOW TABLES;")
+            #print(f"Tablas recuperadas de MySQL: {tables}")
 
             foreign_keys_list = []
 
@@ -67,7 +70,7 @@ def migrate_data():
             mssql_conn.execute_update("BEGIN TRANSACTION;")
 
             try:
-                for table in tables:
+                for table in tables_mysql:
                     table_name = table['Tables_in_' + db_name]
                     print(f'Migrando tabla: {table_name}')
 
@@ -141,7 +144,7 @@ def migrate_data():
                 return
 
             # Insertar datos en las tablas
-            for table in tables:
+            for table in tables_mysql:
                 table_name = table['Tables_in_' + db_name]
                 print(f'Insertando datos en la tabla: {table_name}')
 
@@ -162,6 +165,9 @@ def migrate_data():
                         mssql_conn.execute_update(insert_query)
                     except Exception as e:
                         print(f'Error: {e}')  # Mostrar el error pero continuar con el siguiente registro
+
+
+
 
             # Agregar restricciones de clave foránea a MS SQL Server
             for fk in foreign_keys_list:
@@ -186,9 +192,30 @@ def migrate_data():
                     print(f"Restricción de clave foránea agregada exitosamente a la tabla '{table_name}'.")
                 except Exception as e:
                     print(f"Error al agregar restricción de clave foránea a la tabla '{table_name}': {e}")
+            table_genre = "genre"
+
+            # Consulta para seleccionar los valores de name
+            select_query = f"SELECT name FROM {table_genre};"
+            records = mssql_conn.execute_query(select_query)
+            #print(f"{records[0]}")
+
+            # Agregar columna "recursiva" a la tabla GENRE
+            # Verificar si la columna ya existe
+            check_column_query = f"""
+                    SELECT recursiva FROM genre
+                """
+            column_exists = mssql_conn.execute_query(check_column_query)
+
+            if not column_exists:
+                    alter_table_query = f"ALTER TABLE genre ADD recursiva VARCHAR(255);"
+                    try:
+                        mssql_conn.execute_update(alter_table_query)
+                        print(f'Columna "recursiva" agregada a la tabla: genre')
+                    except Exception as e:
+                        print(f'Error al agregar columna "recursiva" a la tabla genre: {e}')
 
             # Agregar columna "modificación" a cada tabla existente
-            for table in tables:
+            for table in tables_mysql:
                 table_name = table['Tables_in_' + db_name]
                 print(f'Agregando columna "modificación" a la tabla: {table_name}')
 
@@ -206,6 +233,27 @@ def migrate_data():
                         print(f'Columna "modificación" agregada a la tabla: {table_name}')
                     except Exception as e:
                         print(f'Error al agregar columna "modificación" a la tabla {table_name}: {e}')
+
+            # Variable para almacenar el número total de registros
+        total_records_mysql = 0
+
+            # Iterar en las tablas
+        for table in tables_mysql:
+            table_name = table['Tables_in_' + db_name]
+
+                # Obtener datos de MySQL
+            data_query = f"SELECT * FROM {table_name};"
+            data = mysql_conn.execute_query(data_query)
+
+                # Contar el número de registros en la tabla actual
+            table_records = len(data)
+            total_records_mysql += table_records
+            #print(f'Número de registros en la tabla {table_name}: {table_records}')
+
+            # Imprimir el número total de registros
+        print(f'Número total de registros en todas las tablas de mysql: {total_records_mysql}')
+
+
 
     except Exception as e:
         print(f'Error durante la migración: {e}')
