@@ -1,4 +1,3 @@
-import tkinter as tk
 from conect import connect_db
 from const import *
 
@@ -36,21 +35,8 @@ def see(button_frame, display_frame, types, crear_botones_principales):
         widget.destroy()
 
     for record_type in types:
-        tk.Button(
-            button_frame,
-            text=record_type,
-            width=BUTTON_WIDTH,
-            bg=LIGHT_COLOR,
-            fg=DARK_COLOR,
-            font=FONT,
-            command=lambda rt=record_type: display_records(display_frame, rt)
+        tk.Button(button_frame,text=record_type,width=BUTTON_WIDTH,bg=LIGHT_COLOR,fg=DARK_COLOR,font=FONT,command=lambda rt=record_type: display_records(display_frame, rt)
         ).pack(pady=10)
 
-    tk.Button(
-        button_frame,
-        text="Volver",
-        command=lambda: crear_botones_principales(),
-        bg=DARK_COLOR,
-        fg=LIGHT_COLOR,
-        font=FONT
+    tk.Button(button_frame,text="Volver",command=lambda: crear_botones_principales(),bg=DARK_COLOR,fg=LIGHT_COLOR,font=FONT
     ).pack(pady=10)
