@@ -19,8 +19,7 @@ class MySQLConnection:
         """
         try:
             self.connection = mysql.connector.connect(**MYSQL_CONFIG)
-            if self.connection.is_connected():
-                print('Conectado a la base de datos MySQL')
+
         except Error as e:
             print(f'Error: {e}')
 
@@ -30,7 +29,6 @@ class MySQLConnection:
         """
         if self.connection:
             self.connection.close()
-            print('Conexión a MySQL cerrada')
 
     def execute_query(self, query):
         """
@@ -59,4 +57,3 @@ class MySQLConnection:
 
 #test = MySQLConnection()
 #test.connect()
-
