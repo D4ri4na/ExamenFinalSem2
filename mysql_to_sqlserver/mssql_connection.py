@@ -25,7 +25,6 @@ class MSSQLConnection:
                 f"DATABASE=master;"
                 f"Trusted_Connection={MSSQL_CONFIG['trusted_connection']};"
             )
-            print('Conectado a la base de datos maestra de MS SQL Server')
 
             # Crear la base de datos si no existe
             database_name = MYSQL_CONFIG['database']
@@ -46,7 +45,6 @@ class MSSQLConnection:
             ) as temp_connection:
                 cursor = temp_connection.cursor()
                 cursor.execute(create_db_query)
-                # print(f'Base de datos {database_name} creada o ya existe')
 
             # Reconectar a la base de datos recién creada o existente
             self.connection = pyodbc.connect(
@@ -55,7 +53,7 @@ class MSSQLConnection:
                 f"DATABASE={database_name};"
                 f"Trusted_Connection={MSSQL_CONFIG['trusted_connection']};"
             )
-            print(f'Conectado a la base de datos {database_name} de MS SQL Server')
+
 
         except pyodbc.Error as e:
             print(f'Error: {e}')
@@ -66,7 +64,6 @@ class MSSQLConnection:
         """
         if self.connection:
             self.connection.close()
-            print('Conexión a MS SQL Server cerrada')
 
     def execute_query(self, query):
         """
@@ -91,4 +88,3 @@ class MSSQLConnection:
             self.connection.commit()
         except pyodbc.Error as e:
             print(f'Error: {e}')
-
