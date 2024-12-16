@@ -1,13 +1,12 @@
 MYSQL_CONFIG = {
 'host': 'localhost',
 'user': 'root',
-'password': 'Niki0.0Byul',
+'password': '123456789dD.',
 'database': 'bookstore'
 }
 
 MSSQL_CONFIG = {
 'driver': 'ODBC Driver 17 for SQL Server',
-'server': 'NICOLE',
+'server': 'MSI\\MSSQLSERVER01',
 'trusted_connection': 'yes'
 }
-
