@@ -12,10 +12,12 @@ Agregar una columna "parentesis" a la tabla "genre" donde deben estar los valore
 ## Gráficos de mysql_to_sqlserver
 
 ### Diagrama de Clases - Conexión MySQL
-<img src="graficos/Class_diagram/MySQL_connection.jpg" alt="Diagrama de Clases - Conexión MySQL" width="300" style="display: block; margin: auto;">
+![image](https://github.com/user-attachments/assets/b962ca43-de6c-4f03-bf89-0d327862c2ab)
+
 
 ### Diagrama de Clases - Conexión SQL Server
-<img src="graficos/Class_diagram/SQLserver_connection.jpg" alt="Diagrama de Clases - Conexión SQL Server" width="300" style="display: block; margin: auto;">
+![image](https://github.com/user-attachments/assets/3dedfc03-8db7-477b-bc0b-9d5c38734cd7)
+
     
 
 ### Pseudocodigos - Clase: mysql_connection 
