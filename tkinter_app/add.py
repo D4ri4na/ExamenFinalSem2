@@ -32,7 +32,7 @@ def add_record(display_frame, record_type):
         values = [entry.get() for entry in inputs]
         try:
             #Incluir la fecha de modificación en los valores
-            modification_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            modification_date = datetime.now().strftime("%d-%m-%Y %H:%M")
             placeholders = ", ".join(["?" for _ in headers])
             query = f"INSERT INTO {record_type} ({', '.join(headers)}) VALUES ({placeholders})"
             cursor.execute(query, values + [modification_date])
@@ -58,21 +58,8 @@ def add(button_frame, display_frame, types, crear_botones_principales):
         widget.destroy()
 
     for record_type in types:
-        tk.Button(
-            button_frame,
-            text=record_type,
-            width=BUTTON_WIDTH,
-            bg=LIGHT_COLOR,
-            fg=DARK_COLOR,
-            font=FONT,
-            command=lambda rt=record_type: add_record(display_frame, rt)
+        tk.Button(button_frame,text=record_type,width=BUTTON_WIDTH,bg=LIGHT_COLOR,fg=DARK_COLOR,font=FONT,command=lambda rt=record_type: add_record(display_frame, rt)
         ).pack(pady=10)
 
-    tk.Button(
-        button_frame,
-        text="Volver",
-        command=lambda: crear_botones_principales(),
-        bg=DARK_COLOR,
-        fg=LIGHT_COLOR,
-        font=FONT
+    tk.Button(button_frame,text="Volver",command=lambda: crear_botones_principales(),bg=DARK_COLOR,fg=LIGHT_COLOR,font=FONT
     ).pack(pady=10)
